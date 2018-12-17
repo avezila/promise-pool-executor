@@ -43,8 +43,8 @@
     "dependencies": {
         "debug": "^3.1.0",
         "next-tick": "^1.0.0",
-        "p-defer": "^1.0.1",
-        "promise-batcher": "^1.0.2"
+        "p-defer": "avezila/p-defer#24b2a15",
+        "promise-batcher": "avezila/promise-batcher#d0ab1ce"
     },
     "devDependencies": {
         "@types/chai-as-promised": "^7.1.0",
