@@ -1,6 +1,6 @@
 {
     "name": "promise-pool-executor",
-    "version": "1.1.1",
+    "version": "1.1.2",
     "description": "A module for managing ES6 promise concurrency, frequency, and efficiency.",
     "keywords": [
         "promise",
@@ -43,8 +43,8 @@
     "dependencies": {
         "debug": "^3.1.0",
         "next-tick": "^1.0.0",
-        "p-defer": "avezila/p-defer#3a8a2f",
-        "promise-batcher": "avezila/promise-batcher#5f42ef"
+        "p-defer": "^1.0.1",
+        "promise-batcher": "^1.0.2"
     },
     "devDependencies": {
         "@types/chai-as-promised": "^7.1.0",
