@@ -1,47 +1,48 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const defer = require("p-defer");
-const promise_batcher_1 = require("promise-batcher");
-const task_1 = require("../public/task");
-class PersistentBatchTaskPrivate {
-    constructor(pool, options) {
-        let immediate;
-        let delayDeferred;
-        let taskDeferred;
+var defer = require("p-defer");
+var promise_batcher_1 = require("promise-batcher");
+var task_1 = require("../public/task");
+var PersistentBatchTaskPrivate = /** @class */ (function () {
+    function PersistentBatchTaskPrivate(pool, options) {
+        var _this = this;
+        var immediate;
+        var delayDeferred;
+        var taskDeferred;
         this._generator = options.generator;
         this._batcher = new promise_batcher_1.Batcher({
-            batchingFunction: (inputs) => {
+            batchingFunction: function (inputs) {
                 if (!taskDeferred) {
                     throw new Error("Expected taskPromise to be set (internal error).");
                 }
-                const localTaskDeferred = taskDeferred;
+                var localTaskDeferred = taskDeferred;
                 taskDeferred = undefined;
-                let promise;
+                var promise;
                 try {
-                    const result = this._generator(inputs);
+                    var result = _this._generator(inputs);
                     promise = result instanceof Promise ? result : Promise.resolve(result);
                 }
                 catch (err) {
                     promise = Promise.reject(err);
                 }
-                return promise.catch((err) => {
+                return promise.catch(function (err) {
                     // Do not send errors to the task, since they will be received via the getResult promises
                     localTaskDeferred.resolve();
                     throw err;
-                }).then((outputs) => {
+                }).then(function (outputs) {
                     localTaskDeferred.resolve();
                     return outputs;
                 });
             },
-            delayFunction: () => {
+            delayFunction: function () {
                 if (delayDeferred) {
                     throw new Error("Expected delayDeferred not to be set (internal error).");
                 }
-                if (this._task.state >= task_1.TaskState.Exhausted) {
+                if (_this._task.state >= task_1.TaskState.Exhausted) {
                     throw new Error("This task has ended and cannot process more items");
                 }
                 immediate = false;
-                this._task.resume();
+                _this._task.resume();
                 if (immediate) {
                     if (immediate !== true) {
                         throw immediate;
@@ -59,15 +60,15 @@ class PersistentBatchTaskPrivate {
             concurrencyLimit: options.concurrencyLimit,
             frequencyLimit: options.frequencyLimit,
             frequencyWindow: options.frequencyWindow,
-            generator: () => {
-                this._task.pause();
+            generator: function () {
+                _this._task.pause();
                 if (taskDeferred) {
                     immediate = new Error("Expected taskDeferred not to be set (internal error).");
                     return;
                 }
                 taskDeferred = defer();
                 if (delayDeferred) {
-                    const localDelayDefered = delayDeferred;
+                    var localDelayDefered = delayDeferred;
                     delayDeferred = undefined;
                     localDelayDefered.resolve();
                 }
@@ -79,44 +80,69 @@ class PersistentBatchTaskPrivate {
             paused: true,
         });
     }
-    get activePromiseCount() {
-        return this._task.activePromiseCount;
-    }
-    get concurrencyLimit() {
-        return this._task.concurrencyLimit;
-    }
-    set concurrencyLimit(val) {
-        this._task.concurrencyLimit = val;
-    }
-    get frequencyLimit() {
-        return this._task.frequencyLimit;
-    }
-    set frequencyLimit(val) {
-        this._task.frequencyLimit = val;
-    }
-    get frequencyWindow() {
-        return this._task.frequencyWindow;
-    }
-    set frequencyWindow(val) {
-        this._task.frequencyWindow = val;
-    }
-    get freeSlots() {
-        return this._task.freeSlots;
-    }
-    get state() {
-        return this._task.state;
-    }
-    getResult(input) {
+    Object.defineProperty(PersistentBatchTaskPrivate.prototype, "activePromiseCount", {
+        get: function () {
+            return this._task.activePromiseCount;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(PersistentBatchTaskPrivate.prototype, "concurrencyLimit", {
+        get: function () {
+            return this._task.concurrencyLimit;
+        },
+        set: function (val) {
+            this._task.concurrencyLimit = val;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(PersistentBatchTaskPrivate.prototype, "frequencyLimit", {
+        get: function () {
+            return this._task.frequencyLimit;
+        },
+        set: function (val) {
+            this._task.frequencyLimit = val;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(PersistentBatchTaskPrivate.prototype, "frequencyWindow", {
+        get: function () {
+            return this._task.frequencyWindow;
+        },
+        set: function (val) {
+            this._task.frequencyWindow = val;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(PersistentBatchTaskPrivate.prototype, "freeSlots", {
+        get: function () {
+            return this._task.freeSlots;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(PersistentBatchTaskPrivate.prototype, "state", {
+        get: function () {
+            return this._task.state;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    PersistentBatchTaskPrivate.prototype.getResult = function (input) {
         if (this._task.state >= task_1.TaskState.Exhausted) {
             return Promise.reject(new Error("This task has ended and cannot process more items"));
         }
         return this._batcher.getResult(input);
-    }
-    send() {
+    };
+    PersistentBatchTaskPrivate.prototype.send = function () {
         this._batcher.send();
-    }
-    end() {
+    };
+    PersistentBatchTaskPrivate.prototype.end = function () {
         this._task.end();
-    }
-}
+    };
+    return PersistentBatchTaskPrivate;
+}());
 exports.PersistentBatchTaskPrivate = PersistentBatchTaskPrivate;

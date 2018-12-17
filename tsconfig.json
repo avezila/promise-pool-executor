@@ -1,20 +1,17 @@
 {
-    "compileOnSave": true,
-    "compilerOptions": {
-        "target": "es6",
-        "module": "commonjs",
-        "strict": true,
-        "preserveConstEnums": true,
-        "noUnusedLocals": true,
-        "noUnusedParameters": true,
-        "declaration": true,
-        "sourceMap": false,
-        "outDir": "."
-    },
-    "include": [
-        "ts/index.ts",
-        "ts/test/index.ts",
-        "ts/typings/**/*"
-    ],
-    "exclude": []
+  "compileOnSave": true,
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "strict": true,
+    "preserveConstEnums": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "declaration": true,
+    "sourceMap": false,
+    "outDir": ".",
+    "lib": ["es2015"]
+  },
+  "include": ["ts/index.ts", "ts/test/index.ts", "ts/typings/**/*"],
+  "exclude": []
 }

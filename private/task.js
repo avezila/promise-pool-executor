@@ -1,13 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const Debug = require("debug");
-const defer = require("p-defer");
-const task_1 = require("../public/task");
-const utils_1 = require("./utils");
-const debug = Debug("promise-pool-executor:task");
-const GLOBAL_GROUP_INDEX = 0;
-class PromisePoolTaskPrivate {
-    constructor(privateOptions, options) {
+var Debug = require("debug");
+var defer = require("p-defer");
+var task_1 = require("../public/task");
+var utils_1 = require("./utils");
+var debug = Debug("promise-pool-executor:task");
+var GLOBAL_GROUP_INDEX = 0;
+var PromisePoolTaskPrivate = /** @class */ (function () {
+    function PromisePoolTaskPrivate(privateOptions, options) {
+        var _a;
+        var _this = this;
         this._invocations = 0;
         this._invocationLimit = Infinity;
         this._result = [];
@@ -28,13 +30,13 @@ class PromisePoolTaskPrivate {
         this._taskGroup = privateOptions.pool.addGroup(options);
         this._groups = [privateOptions.globalGroup, this._taskGroup];
         if (options.groups) {
-            const groups = options.groups;
-            groups.forEach((group) => {
-                if (group._pool !== this._pool) {
+            var groups = options.groups;
+            groups.forEach(function (group) {
+                if (group._pool !== _this._pool) {
                     throw new Error("options.groups contains a group belonging to a different pool");
                 }
             });
-            this._groups.push(...groups);
+            (_a = this._groups).push.apply(_a, groups);
         }
         this._generator = options.generator;
         // Resolve the promise only after all options have been validated
@@ -42,76 +44,108 @@ class PromisePoolTaskPrivate {
             this.end();
             return;
         }
-        this._groups.forEach((group) => {
+        this._groups.forEach(function (group) {
             group._incrementTasks();
         });
         // The creator will trigger the promises to run
     }
-    get activePromiseCount() {
-        return this._taskGroup._activePromiseCount;
-    }
-    get invocations() {
-        return this._invocations;
-    }
-    get invocationLimit() {
-        return this._invocationLimit;
-    }
-    set invocationLimit(val) {
-        if (utils_1.isNull(val)) {
-            this._invocationLimit = Infinity;
-        }
-        else if (!isNaN(val) && typeof val === "number" && val >= 0) {
-            this._invocationLimit = val;
-            if (this._invocations >= this._invocationLimit) {
-                this.end();
+    Object.defineProperty(PromisePoolTaskPrivate.prototype, "activePromiseCount", {
+        get: function () {
+            return this._taskGroup._activePromiseCount;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(PromisePoolTaskPrivate.prototype, "invocations", {
+        get: function () {
+            return this._invocations;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(PromisePoolTaskPrivate.prototype, "invocationLimit", {
+        get: function () {
+            return this._invocationLimit;
+        },
+        set: function (val) {
+            if (utils_1.isNull(val)) {
+                this._invocationLimit = Infinity;
             }
-        }
-        else {
-            throw new Error("Invalid invocation limit: " + val);
-        }
-        if (this._triggerCallback) {
-            this._triggerCallback();
-        }
-    }
-    get concurrencyLimit() {
-        return this._taskGroup.concurrencyLimit;
-    }
-    set concurrencyLimit(val) {
-        this._taskGroup.concurrencyLimit = val;
-    }
-    get frequencyLimit() {
-        return this._taskGroup.frequencyLimit;
-    }
-    set frequencyLimit(val) {
-        this._taskGroup.frequencyLimit = val;
-    }
-    get frequencyWindow() {
-        return this._taskGroup.frequencyWindow;
-    }
-    set frequencyWindow(val) {
-        this._taskGroup.frequencyWindow = val;
-    }
-    get freeSlots() {
-        let freeSlots = this._invocationLimit - this._invocations;
-        this._groups.forEach((group) => {
-            const slots = group.freeSlots;
-            if (slots < freeSlots) {
-                freeSlots = slots;
+            else if (!isNaN(val) && typeof val === "number" && val >= 0) {
+                this._invocationLimit = val;
+                if (this._invocations >= this._invocationLimit) {
+                    this.end();
+                }
             }
-        });
-        return freeSlots;
-    }
-    get state() {
-        return this._state;
-    }
+            else {
+                throw new Error("Invalid invocation limit: " + val);
+            }
+            if (this._triggerCallback) {
+                this._triggerCallback();
+            }
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(PromisePoolTaskPrivate.prototype, "concurrencyLimit", {
+        get: function () {
+            return this._taskGroup.concurrencyLimit;
+        },
+        set: function (val) {
+            this._taskGroup.concurrencyLimit = val;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(PromisePoolTaskPrivate.prototype, "frequencyLimit", {
+        get: function () {
+            return this._taskGroup.frequencyLimit;
+        },
+        set: function (val) {
+            this._taskGroup.frequencyLimit = val;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(PromisePoolTaskPrivate.prototype, "frequencyWindow", {
+        get: function () {
+            return this._taskGroup.frequencyWindow;
+        },
+        set: function (val) {
+            this._taskGroup.frequencyWindow = val;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(PromisePoolTaskPrivate.prototype, "freeSlots", {
+        get: function () {
+            var freeSlots = this._invocationLimit - this._invocations;
+            this._groups.forEach(function (group) {
+                var slots = group.freeSlots;
+                if (slots < freeSlots) {
+                    freeSlots = slots;
+                }
+            });
+            return freeSlots;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(PromisePoolTaskPrivate.prototype, "state", {
+        get: function () {
+            return this._state;
+        },
+        enumerable: true,
+        configurable: true
+    });
     /**
      * Returns a promise which resolves when the task completes.
      */
-    promise() {
+    PromisePoolTaskPrivate.prototype.promise = function () {
         if (this._rejection) {
             if (this._rejection.promise) {
                 // First handling of this rejection. Return the unhandled promise.
-                const promise = this._rejection.promise;
+                var promise = this._rejection.promise;
                 this._rejection.promise = undefined;
                 return promise;
             }
@@ -120,34 +154,34 @@ class PromisePoolTaskPrivate {
         else if (this._state === task_1.TaskState.Terminated) {
             return Promise.resolve(this._returnResult);
         }
-        const deferred = defer();
+        var deferred = defer();
         this._deferreds.push(deferred);
         return deferred.promise;
-    }
+    };
     /**
      * Pauses an active task, preventing any additional promises from being generated.
      */
-    pause() {
+    PromisePoolTaskPrivate.prototype.pause = function () {
         if (this._state === task_1.TaskState.Active) {
             debug("State: %o", "Paused");
             this._state = task_1.TaskState.Paused;
         }
-    }
+    };
     /**
      * Resumes a paused task, allowing for the generation of additional promises.
      */
-    resume() {
+    PromisePoolTaskPrivate.prototype.resume = function () {
         if (this._state === task_1.TaskState.Paused) {
             debug("State: %o", "Active");
             this._state = task_1.TaskState.Active;
             this._triggerCallback();
         }
-    }
+    };
     /**
      * Ends the task. Any promises created by the promise() method will be resolved when all outstanding promises
      * have ended.
      */
-    end() {
+    PromisePoolTaskPrivate.prototype.end = function () {
         // Note that this does not trigger more tasks to run. It can resolve a task though.
         if (this._state < task_1.TaskState.Exhausted) {
             debug("State: %o", "Exhausted");
@@ -160,41 +194,43 @@ class PromisePoolTaskPrivate {
             debug("State: %o", "Terminated");
             this._state = task_1.TaskState.Terminated;
             if (this._taskGroup._activeTaskCount > 0) {
-                this._groups.forEach((group) => {
+                this._groups.forEach(function (group) {
                     group._decrementTasks();
                 });
             }
             this._resolve();
         }
-    }
+    };
     /**
      * Private. Returns 0 if the task is ready, Infinity if the task is busy with an indeterminate ready time, or the
      * timestamp for when the task will be ready.
      */
-    _busyTime() {
+    PromisePoolTaskPrivate.prototype._busyTime = function () {
         if (this._state !== task_1.TaskState.Active) {
             return Infinity;
         }
-        let time = 0;
-        for (const group of this._groups) {
-            const busyTime = group._busyTime();
+        var time = 0;
+        for (var _i = 0, _a = this._groups; _i < _a.length; _i++) {
+            var group = _a[_i];
+            var busyTime = group._busyTime();
             if (busyTime > time) {
                 time = busyTime;
             }
         }
         return time;
-    }
-    _cleanFrequencyStarts(now) {
-        this._groups.forEach((group, index) => {
+    };
+    PromisePoolTaskPrivate.prototype._cleanFrequencyStarts = function (now) {
+        this._groups.forEach(function (group, index) {
             if (index > GLOBAL_GROUP_INDEX) {
                 group._cleanFrequencyStarts(now);
             }
         });
-    }
+    };
     /**
      * Private. Invokes the task.
      */
-    _run() {
+    PromisePoolTaskPrivate.prototype._run = function () {
+        var _this = this;
         if (this._generating) {
             // This should never happen
             throw new Error("Internal Error: Task is already being run");
@@ -206,7 +242,7 @@ class PromisePoolTaskPrivate {
             return;
         }
         debug("Running generator");
-        let promise;
+        var promise;
         this._generating = true; // prevent task termination
         try {
             promise = this._generator.call(this, this._invocations);
@@ -228,43 +264,44 @@ class PromisePoolTaskPrivate {
             // In case what is returned is not a promise, make it one
             promise = Promise.resolve(promise);
         }
-        this._groups.forEach((group) => {
+        this._groups.forEach(function (group) {
             group._activePromiseCount++;
             if (group._frequencyLimit !== Infinity) {
                 group._frequencyStarts.push(Date.now());
             }
         });
-        const resultIndex = this._invocations;
+        var resultIndex = this._invocations;
         this._invocations++;
         if (this._invocations >= this._invocationLimit) {
             // this will not detach the task since there are active promises
             this.end();
         }
-        promise.catch((err) => {
-            this._reject(err);
+        promise.catch(function (err) {
+            _this._reject(err);
             // Resolve
-        }).then((result) => {
+        }).then(function (result) {
             debug("Promise ended.");
-            this._groups.forEach((group) => {
+            _this._groups.forEach(function (group) {
                 group._activePromiseCount--;
             });
-            debug("Promise Count: %o", this._taskGroup._activePromiseCount);
+            debug("Promise Count: %o", _this._taskGroup._activePromiseCount);
             // Avoid storing the result if it is undefined.
             // Some tasks may have countless iterations and never return anything, so this could eat memory.
-            if (result !== undefined && this._result) {
-                this._result[resultIndex] = result;
+            if (result !== undefined && _this._result) {
+                _this._result[resultIndex] = result;
             }
-            if (this._state >= task_1.TaskState.Exhausted && this._taskGroup._activePromiseCount <= 0) {
-                this.end();
+            if (_this._state >= task_1.TaskState.Exhausted && _this._taskGroup._activePromiseCount <= 0) {
+                _this.end();
             }
             // Remove the task if needed and start the next task
-            this._triggerCallback();
+            _this._triggerCallback();
         });
-    }
+    };
     /**
      * Private. Resolves the task if possible. Should only be called by end()
      */
-    _resolve() {
+    PromisePoolTaskPrivate.prototype._resolve = function () {
+        var _this = this;
         if (this._rejection || !this._result) {
             return;
         }
@@ -286,33 +323,33 @@ class PromisePoolTaskPrivate {
         // discard the original array to free memory
         this._result = undefined;
         if (this._deferreds.length) {
-            this._deferreds.forEach((deferred) => {
-                deferred.resolve(this._returnResult);
+            this._deferreds.forEach(function (deferred) {
+                deferred.resolve(_this._returnResult);
             });
             this._deferreds.length = 0;
         }
-    }
-    _reject(err) {
+    };
+    PromisePoolTaskPrivate.prototype._reject = function (err) {
         // Check if the task has already failed
         if (this._rejection) {
             debug("This task already failed. Redundant error: %O", err);
             return;
         }
-        const taskError = {
+        var taskError = {
             error: err,
         };
         this._rejection = taskError;
-        let handled = false;
+        var handled = false;
         // This may detach the task
         this.end();
         if (this._deferreds.length) {
             handled = true;
-            this._deferreds.forEach((deferred) => {
+            this._deferreds.forEach(function (deferred) {
                 deferred.reject(taskError.error);
             });
             this._deferreds.length = 0;
         }
-        this._groups.forEach((group) => {
+        this._groups.forEach(function (group) {
             if (group._reject(taskError)) {
                 handled = true;
             }
@@ -321,6 +358,7 @@ class PromisePoolTaskPrivate {
             // Create an unhandled rejection which may be handled later
             taskError.promise = Promise.reject(err);
         }
-    }
-}
+    };
+    return PromisePoolTaskPrivate;
+}());
 exports.PromisePoolTaskPrivate = PromisePoolTaskPrivate;
